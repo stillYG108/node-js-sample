@@ -7,16 +7,6 @@ pipeline {
     }
 
     stages {
-        // 🟢 Remove or fix this Checkout stage
-        stage('Checkout') {
-            steps {
-                // Jenkins already clones your repo before reading this file
-                // So we can either remove this stage or replace the placeholder URL with your real repo URL
-
-                git branch: 'master', url: 'https://github.com/stillYG108/node-js-sample.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -29,11 +19,14 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    echo "Running Docker container..."
-                    // Stop old container if running
+                    echo "Stopping old container (if exists)..."
                     sh "docker rm -f ${CONTAINER_NAME} || true"
-                    // Run new container
+
+                    echo "Starting new container..."
                     sh "docker run -d -p 3000:5000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}"
+
+                    echo "Container logs:"
+                    sh "docker logs ${CONTAINER_NAME}"
                 }
             }
         }
